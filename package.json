@@ -1,0 +1,23 @@
+{
+  "name": "ilost-core",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iLost-iACADEMY/iLostIt-core.git"
+  },
+  "author": "iLost",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/iLost-iACADEMY/iLostIt-core/issues"
+  },
+  "homepage": "https://github.com/iLost-iACADEMY/iLostIt-core#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "nodemon": "^2.0.21"
+  }
+}
