@@ -3,9 +3,9 @@ const app = express()
 const port = 6885
 
 app.get('/', (req, res) => {
-  res.send('Hello World!')
+  res.send('iLost Backend Running...')
 })
 
-app.listen(port, () => {
+app.listen(port, "0.0.0.0", () => {
   console.log(`Listening on port ${port}`)
 })
