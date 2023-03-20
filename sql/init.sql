@@ -3,5 +3,6 @@ CREATE DATABASE `ilost`;
 
 CREATE TABLE `ilost`.`items` (`id` INT NOT NULL AUTO_INCREMENT , `item_name` VARCHAR(1000) NOT NULL , `lost_since` TIMESTAMP NOT NULL , `image` VARCHAR(30) NOT NULL COMMENT 'Image Key' , `foundlost_by` VARCHAR(1000) NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
 CREATE TABLE `ilost`.`founded` (`id` INT NOT NULL AUTO_INCREMENT , `item` INT NOT NULL , `founded` BOOLEAN NOT NULL , `owner` VARCHAR(1000) NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+CREATE TABLE `ilost`.`accounts` (`id` INT NOT NULL AUTO_INCREMENT , `username` VARCHAR(1000) NOT NULL , `password` VARCHAR(1000) NOT NULL , `permission` INT NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
 
 ALTER TABLE `founded` ADD CONSTRAINT `fk_item` FOREIGN KEY (`item`) REFERENCES `items`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
