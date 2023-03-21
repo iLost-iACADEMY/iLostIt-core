@@ -20,7 +20,7 @@ services:
       - ./dbdata/db:/var/lib/mysql/:rw
       - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - "3306:3306"
+      - "3307:3306"
     environment:
       - MYSQL_DATABASE=root
       - MYSQL_ROOT_PASSWORD=root

@@ -1,12 +1,18 @@
 const express = require('express')
 const http = require('http').Server(express);
 const io = require("socket.io")(http);
+const mysql = require('mysql')
 const app = express()
+
+const items = require('./items')
 
 // Backend Request-Response Server
 app.get('/', (req, res) => {
   res.send('iLost Backend Running...')
 })
+
+// Backend Routes
+app.use('/items', items)
 
 // Realtime Server
 io.on('connection', function(socket) {
