@@ -5,14 +5,18 @@ const mysql = require('mysql')
 const app = express()
 
 const items = require('./items')
+const accounts = require('./accounts')
 
 // Backend Request-Response Server
 app.get('/', (req, res) => {
   res.send('iLost Backend Running...')
 })
 
+app.use(express.json()) 
+
 // Backend Routes
 app.use('/items', items)
+app.use('/accounts', accounts)
 
 // Realtime Server
 io.on('connection', function(socket) {
