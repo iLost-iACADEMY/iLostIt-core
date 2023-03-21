@@ -28,7 +28,13 @@ router.get('/', (req, res) => {
 router.post('/join', (req, res) => {
     con.connect()
 
-    var sql = "INSERT";
+    function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    var sql = `INSERT INTO 'accounts' ('id', 'username', 'password', 'permission') VALUES (?, ?, ?, ?);`;
     
     res.json({
         "status": "success"
