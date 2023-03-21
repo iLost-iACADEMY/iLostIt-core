@@ -2,7 +2,6 @@ const express = require('express')
 const http = require('http').Server(express);
 const io = require("socket.io")(http);
 const app = express()
-const port = 6885
 
 // Backend Request-Response Server
 app.get('/', (req, res) => {
@@ -18,6 +17,10 @@ io.on('connection', function(socket) {
   });
 });
 
-http.listen(port, "0.0.0.0", () => {
-  console.log(`Listening on port ${port}`)
+app.listen(6885, "0.0.0.0", () => {
+  console.log(`Backend Listening on port ${6885}`)
+})
+
+http.listen(6886, "0.0.0.0", () => {
+  console.log(`Realtime Listening on port ${6886}`)
 })

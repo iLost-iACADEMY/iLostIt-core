@@ -9,6 +9,7 @@ services:
       - /usr/app/node_modules
     ports:
       - "6885:6885"
+      - "6886:6886"
   mysql:
     restart: always
     image: mysql:latest
