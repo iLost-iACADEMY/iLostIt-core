@@ -3,9 +3,13 @@ const http = require('http').Server(express);
 const io = require("socket.io")(http);
 const mysql = require('mysql')
 const app = express()
+const cors = require('cors')
 
 const items = require('./items')
 const accounts = require('./accounts')
+
+app.use(cors())
+app.options('*', cors())
 
 // Backend Request-Response Server
 app.get('/', (req, res) => {

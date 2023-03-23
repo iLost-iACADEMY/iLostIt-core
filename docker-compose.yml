@@ -7,6 +7,7 @@ services:
     volumes:
       - .:/usr/app/
       - /usr/app/node_modules
+      - ./cdn:/usr/app/cdn
     ports:
       - "6885:6885"
       - "6886:6886"
