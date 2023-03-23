@@ -14,7 +14,12 @@ var con = mysql.createConnection({
 router.get('/', (req, res) => {
     con.connect()
 
-    var sql = "";
+    var sql = "SELECT * FROM `items`";
+
+    con.query(sql, function (err, result) {
+        if (err) throw err;
+        console.log(result);
+    })
 
     res.json({
         "status": "success",
