@@ -42,6 +42,19 @@ router.post('/join', (req, res) => {
 
     con.end()
 })
-
+app.post('/register',(res,req)=>
+{
+    const{username,password,confirmpassword}=req.body
+    const query='INSERT INTO accounts (username,password,permission) VALUES(?,?,?)';
+    if(password==confirmpassword)
+    {
+        connection.query(query,[username,password,"4"],(error,results,fields)=>
+        {
+            if(error) throw error;
+            res.send("Registered Success!");
+        })
+    }
+   
+})
 
 module.exports = router
