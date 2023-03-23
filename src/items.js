@@ -18,11 +18,7 @@ router.get('/', (req, res) => {
 
     con.query(sql, function (err, result) {
         if (err) throw err;
-        console.log(result);
-    })
-
-    res.json({
-        "status": "success",
+        res.json(result)
     })
 
     con.end()
