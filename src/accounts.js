@@ -25,36 +25,23 @@ router.get('/', (req, res) => {
     con.end()
 })
 
-router.post('/join', (req, res) => {
+router.post('/register', (req, res) => {
     con.connect()
 
-    function getRandomInt(min, max) {
-        min = Math.ceil(min);
-        max = Math.floor(max);
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
+    var salt = bcrypt.genSaltSync(10);
+    var hash = bcrypt.hashSync(req.body.password, salt);
 
-    var sql = `INSERT INTO 'accounts' ('id', 'username', 'password', 'permission') VALUES (?, ?, ?, ?);`;
-    
-    res.json({
-        "status": "success"
-    })
-
-    con.end()
-})
-app.post('/register',(res,req)=>
-{
-    const{username,password,confirmpassword}=req.body
-    const query='INSERT INTO accounts (username,password,permission) VALUES(?,?,?)';
-    if(password==confirmpassword)
-    {
-        connection.query(query,[username,password,"4"],(error,results,fields)=>
-        {
-            if(error) throw error;
-            res.send("Registered Success!");
+    const { username, password, confirmpassword } = req.body
+    const query = 'INSERT INTO accounts (username, password, permission) VALUES(?, ?, ?)';
+    if (password == confirmpassword) {
+        con.query(query, [username, hash, "4"], (error, results, fields) => {
+            if (error) throw error;
+            res.json("Registered! Welcome to iLost");
         })
+    } else {
+        res.status(403).json("Password doesn't match")
     }
-   
+    con.end()
 })
 
 module.exports = router
