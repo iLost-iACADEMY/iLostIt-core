@@ -8,7 +8,8 @@ var con = mysql.createConnection({
     user: mysqlconndet.username,
     password: mysqlconndet.password,
     database: mysqlconndet.database,
-    port: mysqlconndet.port
+    port: mysqlconndet.port,
+    connectTimeout: 99999999
 });
 
 router.get('/', (req, res) => {
@@ -21,7 +22,6 @@ router.get('/', (req, res) => {
         res.json(result)
     })
 
-    con.end()
 })
 
 module.exports = router

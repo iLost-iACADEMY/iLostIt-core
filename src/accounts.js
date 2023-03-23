@@ -10,7 +10,8 @@ var con = mysql.createConnection({
     user: mysqlconndet.username,
     password: mysqlconndet.password,
     database: mysqlconndet.database,
-    port: mysqlconndet.port
+    port: mysqlconndet.port,
+    connectTimeout: 99999999
 });
 
 router.get('/', (req, res) => {
@@ -21,8 +22,6 @@ router.get('/', (req, res) => {
     res.json({
         "status": "success",
     })
-
-    con.end()
 })
 
 router.post('/register', (req, res) => {
@@ -41,7 +40,6 @@ router.post('/register', (req, res) => {
     } else {
         res.status(403).json("Password doesn't match")
     }
-    con.end()
 })
 
 module.exports = router

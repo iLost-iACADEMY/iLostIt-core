@@ -7,6 +7,7 @@ const cors = require('cors')
 
 const items = require('./items')
 const accounts = require('./accounts')
+const cdn = require('./cdn')
 
 app.use(cors())
 app.options('*', cors())
@@ -21,6 +22,7 @@ app.use(express.json())
 // Backend Routes
 app.use('/items', items)
 app.use('/accounts', accounts)
+app.use('/cdn', cdn)
 
 // Realtime Server
 io.on('connection', function(socket) {

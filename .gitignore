@@ -2,3 +2,4 @@ node_modules
 yarn.lock
 dbdata
 phpmyadmin_data
+cdn
