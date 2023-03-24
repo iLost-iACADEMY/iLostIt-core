@@ -4,6 +4,7 @@ const io = require("socket.io")(http);
 const mysql = require('mysql')
 const app = express()
 const cors = require('cors')
+const session = require('express-session')
 
 const items = require('./items')
 const accounts = require('./accounts')
@@ -11,6 +12,12 @@ const cdn = require('./cdn')
 
 app.use(cors())
 app.options('*', cors())
+
+app.use(session({
+	secret: 'secret',
+	resave: true,
+	saveUninitialized: true
+}));
 
 // Backend Request-Response Server
 app.get('/', (req, res) => {
