@@ -7,6 +7,7 @@ CREATE TABLE `ilost`.`accounts` (`id` INT NOT NULL AUTO_INCREMENT , `username` V
 CREATE TABLE `ilost`.`messages` (`id` INT NOT NULL AUTO_INCREMENT , `message` VARCHAR(5000) NOT NULL , `sender` INT NOT NULL , `receiver` INT NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
 CREATE TABLE `ilost`.`report` (`id` INT NOT NULL AUTO_INCREMENT , `reason` VARCHAR(1500) NOT NULL , `item` INT NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
 CREATE TABLE `ilost`.`audit` (`id` INT NOT NULL AUTO_INCREMENT , `action` VARCHAR(1000) NOT NULL , `act_by` INT NOT NULL , `description` VARCHAR(1000) NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
+CREATE TABLE `ilost`.`sessions` (`id` INT NOT NULL AUTO_INCREMENT , `userkey` INT NOT NULL , `token` VARCHAR(500) NOT NULL , `signedin` DATETIME NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
 
 ALTER TABLE `founded` ADD CONSTRAINT `fk_item` FOREIGN KEY (`item`) REFERENCES `items`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
 ALTER TABLE `messages` ADD CONSTRAINT `fk_sender` FOREIGN KEY (`sender`) REFERENCES `accounts`(`id`) ON DELETE NO ACTION ON UPDATE RESTRICT;
@@ -15,3 +16,4 @@ ALTER TABLE `messages` ADD CONSTRAINT `fk_itemmsggroup` FOREIGN KEY (`item`) REF
 ALTER TABLE `items` ADD CONSTRAINT `fk_lostitemfounder` FOREIGN KEY (`foundlost_by`) REFERENCES `accounts`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
 ALTER TABLE `report` ADD CONSTRAINT `fk_itemreported` FOREIGN KEY (`id`) REFERENCES `items`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 ALTER TABLE `audit` ADD CONSTRAINT `fk_actby` FOREIGN KEY (`act_by`) REFERENCES `accounts`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
+ALTER TABLE `sessions` ADD CONSTRAINT `fk_usersession` FOREIGN KEY (`userkey`) REFERENCES `accounts`(`id`) ON DELETE CASCADE ON UPDATE RESTRICT;
