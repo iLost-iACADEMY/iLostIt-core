@@ -3,7 +3,7 @@ const router = express.Router()
 const mysqlconndet = require('./mysql.json')
 const mysql = require('mysql2')
 var bcrypt = require('bcryptjs');
-
+const crypto = require('crypto');
 
 var con = mysql.createConnection({
     host: mysqlconndet.serverhost,
@@ -21,6 +21,71 @@ router.get('/', (req, res) => {
 
     res.json({
         "status": "success",
+    })
+})
+
+router.post('/login', (req, res) => {
+    con.connect()
+
+    function encrypt(key, data) {
+        var cipher = crypto.createCipher('aes-256-cbc', key);
+        var crypted = cipher.update(data, 'utf-8', 'hex');
+        crypted += cipher.final('hex');
+
+        return crypted;
+    }
+
+    function decrypt(key, data) {
+        var decipher = crypto.createDecipher('aes-256-cbc', key);
+        var decrypted = decipher.update(data, 'hex', 'utf-8');
+        decrypted += decipher.final('utf-8');
+
+        return decrypted;
+    }
+
+    function makesha(length) {
+        var result = '';
+        var characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        var charactersLength = characters.length;
+        for (var i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+    }
+
+    const { username, password } = req.body
+    const query = 'SELECT * FROM accounts WHERE username = ?';
+    con.query(query, [username], (error, results, fields) => {
+        if (error) throw error;
+        if (results.length > 0) {
+            if (bcrypt.compareSync(password, results[0].password)) {
+                const query = 'INSERT INTO sessions (userkey, token, sha) VALUES(?, ?, ?)';
+                const shad = makesha(5);
+                const token =  encrypt("ilost", results[0].username + '+' + results[0].permission + '+' + shad);
+
+                con.query(query, [results[0].id, token, shad], (error, results1, fields) => {
+                    if (error) throw error;
+                    res.json({
+                        "status": "success",
+                        "message": "Logged in!",
+                        "permission": results[0].permission,
+                        "username": results[0].username,
+                        "token": token,
+                        "shad": shad
+                    })
+                })
+            } else {
+                res.status(403).json({
+                    "status": "error",
+                    "message": "Wrong password!"
+                })
+            }
+        } else {
+            res.status(403).json({
+                "status": "error",
+                "message": "User doesn't exist!"
+            })
+        }
     })
 })
 
