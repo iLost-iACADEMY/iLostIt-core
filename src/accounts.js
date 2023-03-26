@@ -24,6 +24,49 @@ router.get('/', (req, res) => {
     })
 })
 
+router.get('/me', (req, res) => {
+    con.connect()
+
+    function decrypt(key, data) {
+        var decipher = crypto.createDecipher('aes-256-cbc', key);
+        var decrypted = decipher.update(data, 'hex', 'utf-8');
+        decrypted += decipher.final('utf-8');
+
+        return decrypted;
+    }
+
+    const token = req.query.token;
+    const query = 'SELECT * FROM sessions WHERE token = ?';
+    con.query(query, [token], (error, results, fields) => {
+        if (error) throw error;
+        if (results.length > 0) {
+            const decrypted = decrypt("ilost", token);
+            const split = decrypted.split('+');
+            const username = split[0];
+            const permission = split[1];
+            const sha = split[2];
+
+            if (sha == results[0].sha) {
+                res.json({
+                    "status": "success",
+                    "username": username,
+                    "permission": permission
+                })
+            } else {
+                res.json({
+                    "status": "error",
+                    "message": "Invalid token"
+                })
+            }
+        } else {
+            res.json({
+                "status": "error",
+                "message": "Invalid token"
+            })
+        }
+    })
+})
+
 router.post('/login', (req, res) => {
     con.connect()
 
