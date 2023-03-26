@@ -21,3 +21,5 @@ ALTER TABLE `sessions` ADD CONSTRAINT `fk_usersession` FOREIGN KEY (`userkey`) R
 ALTER TABLE `items` MODIFY `lost_since` timestamp DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE `sessions` MODIFY `signedin` datetime DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE `audit` MODIFY `since` timestamp DEFAULT CURRENT_TIMESTAMP;
+
+INSERT INTO `accounts` (`id`, `username`, `password`, `joined`, `permission`) VALUES ('1', 'admin', '$2y$10$3gfQvLr2Abxp5umPYyCENuPYwR0QeiZDSV4VQVx8FKlcFJCwX4rJa', CURRENT_TIMESTAMP, '1')
