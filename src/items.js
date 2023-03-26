@@ -15,7 +15,7 @@ var con = mysql.createConnection({
 router.get('/', (req, res) => {
     con.connect()
 
-    var sql = "SELECT * FROM `items`";
+    var sql = "SELECT * FROM `items` JOIN `accounts` ON items.foundlost_by = accounts.id;";
 
     con.query(sql, function (err, result) {
         if (err) throw err;
