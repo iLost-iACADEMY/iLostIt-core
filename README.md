@@ -12,6 +12,13 @@ This is the backend for the iLost project. This project is a web application tha
 3. Run `docker-compose up -d` to initialize Docker
 4. After 3 containers are started and running, Go to `localhost:6885` on your browser, If it shows `'iLost Backend Running...'`, you are good to go!
 
+## Accessing Admin
+From iLost Web, here are the credentials for admin since the project initialization:
+
+Username: `admin`
+
+Password: `admin`
+
 ## Contributing
 1. Create a new branch and name it according to the feature you are working on
 2. After you are done with the feature, create a pull request to the `dev` branch
