@@ -72,7 +72,7 @@ router.get('/item', (req, res) => {
                 if (error) throw error;
                 if (results.length > 0) {
                     if (sessionBearerToken == results[0].token && results[0].permission <= 4) {
-                        res.json(result[0]) // User Has Permission
+                        res.json({...result[0], permissionLevel: results[0].permission}) // User Has Permission
                     } else {
                         res.status(403).json({
                             "status": "error",
@@ -159,6 +159,96 @@ router.post('/add', uploadinit(), (req, res) => {
             "message": "Forbidden"
         })
     }
+})
+
+router.delete('/delete', (req, res) => {
+    var sql = "SELECT * FROM items JOIN accounts ON items.foundlost_by = accounts.id WHERE items.id = ?";
+    con.query(sql, [req.query.itemid], function (err, result) {
+        if (err) throw err;
+
+        try {
+            session = req.headers['authorization']
+            sessionBearer = session.split(' ');
+            sessionBearerToken = sessionBearer[1];
+
+            const query = 'SELECT * FROM sessions JOIN accounts ON sessions.userkey = accounts.id WHERE token = ?';
+            con.query(query, [sessionBearerToken], (error, results, fields) => {
+                if (error) throw error;
+                if (results.length > 0) {
+                    if (sessionBearerToken == results[0].token && results[0].permission <= 4 && (results[0].userkey == result[0].foundlost_by || results[0].permission <= 3)) {
+                        var sql = "DELETE FROM items WHERE id = ?";
+                        con.query(sql, [req.body.itemid], function (err, result) {
+                            if (err) throw err;
+                            res.json({
+                                "status": "success",
+                                "message": "Deleted Successfully!"
+                            })
+                        })
+                    } else {
+                        res.status(403).json({
+                            "status": "error",
+                            "message": "Invalid token or Unauthorized"
+                        })
+                    }
+                } else {
+                    res.status(403).json({
+                        "status": "error",
+                        "message": "Forbidden"
+                    })
+                }
+            })
+        } catch (e) {
+            res.status(403).json({
+                "status": "error",
+                "message": "Forbidden"
+            })
+        }
+    })
+})
+
+router.post('/report', (req, res) => {
+    var sql = "SELECT * FROM items JOIN accounts ON items.foundlost_by = accounts.id WHERE items.id = ?";
+    con.query(sql, [req.query.itemid], function (err, result) {
+        if (err) throw err;
+
+        try {
+            session = req.headers['authorization']
+            sessionBearer = session.split(' ');
+            sessionBearerToken = sessionBearer[1];
+
+            const query = 'SELECT * FROM sessions JOIN accounts ON sessions.userkey = accounts.id WHERE token = ?';
+            con.query(query, [sessionBearerToken], (error, results, fields) => {
+                if (error) throw error;
+                if (results.length > 0) {
+                    if (sessionBearerToken == results[0].token && results[0].permission <= 4) {
+                        const query = "INSERT INTO `report` (reason, item) VALUES (?, ?)";
+                        con.query(query, [req.body.reason, req.body.itemid], (error, results, fields) => {
+                            if (error) throw error;
+                            res.json({
+                                "status": "success",
+                                "message": "Reported Successfully!"
+                            })
+                        })
+                    } else {
+                        res.status(403).json({
+                            "status": "error",
+                            "message": "Invalid token"
+                        })
+                    }
+                } else {
+                    res.status(403).json({
+                        "status": "error",
+                        "message": "Forbidden"
+                    })
+                }
+            })
+        } catch (e) {
+            res.status(403).json({
+                "status": "error",
+                "message": "Forbidden"
+            })
+        }
+    })
 })
 
 module.exports = router
