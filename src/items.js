@@ -95,7 +95,6 @@ router.get('/item', (req, res) => {
     })
 })
 
-
 function makegenfoldimg(length) {
     var result = '';
     var characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
@@ -106,28 +105,33 @@ function makegenfoldimg(length) {
     return result;
 }
 
-const genfoldimg = makegenfoldimg(10)
+let genfoldimg = makegenfoldimg(10)
 
-var upload = multer({
-    storage: multer.diskStorage({
-        destination: (req, file, cb) => {
-            cb(null, "./cdn");
-        },
-        filename: (req, file, cb) => {
-            cb(null, genfoldimg)
+function uploadinit() {
+    genfoldimg = makegenfoldimg(10)
+    var upload = multer({
+        storage: multer.diskStorage({
+            destination: (req, file, cb) => {
+                cb(null, "./cdn");
+            },
+            filename: (req, file, cb) => {
+                cb(null, genfoldimg)
+            }
+        }),
+        fileFilter: (req, file, cb) => {
+            if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg") {
+                cb(null, true);
+            } else {
+                cb(null, false);
+                return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
+            }
         }
-    }),
-    fileFilter: (req, file, cb) => {
-        if (file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg") {
-            cb(null, true);
-        } else {
-            cb(null, false);
-            return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
-        }
-    }
-});
+    });
 
-router.post('/add', upload.single('image'), (req, res) => {
+    return upload.single('image')
+}
+
+router.post('/add', uploadinit(), (req, res) => {
     con.connect()
 
     try {
@@ -141,6 +145,7 @@ router.post('/add', upload.single('image'), (req, res) => {
             var sql = "INSERT INTO `items` (item_name, image, foundlost_by, status) VALUES (?, ?, ?, ?)";
             con.query(sql, [req.body.item_name, genfoldimg, results[0].userkey, "pending"], function (err, result) {
                 if (err) throw err;
+                genfoldimg = makegenfoldimg(10)
                 res.json({
                     "id": result.insertId,
                     "status": "success",
