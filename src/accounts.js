@@ -50,7 +50,8 @@ router.get('/me', (req, res) => {
                 res.json({
                     "status": "success",
                     "username": username,
-                    "permission": permission
+                    "permission": permission,
+                    "userid": results[0].userkey
                 })
             } else {
                 res.json({

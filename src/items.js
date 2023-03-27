@@ -163,7 +163,7 @@ router.post('/add', uploadinit(), (req, res) => {
 
 router.delete('/delete', (req, res) => {
     var sql = "SELECT * FROM items JOIN accounts ON items.foundlost_by = accounts.id WHERE items.id = ?";
-    con.query(sql, [req.query.itemid], function (err, result) {
+    con.query(sql, [req.body.itemid], function (err, result) {
         if (err) throw err;
 
         try {
