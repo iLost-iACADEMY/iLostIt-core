@@ -16,7 +16,7 @@ var con = mysql.createConnection({
 router.get('/', (req, res) => {
     con.connect()
 
-    var sql = "SELECT items.id, item_name, lost_since, image, accounts.username FROM `items` JOIN `accounts` ON items.foundlost_by = accounts.id;";
+    var sql = "SELECT items.id, item_name, lost_since, image, status, accounts.username FROM `items` JOIN `accounts` ON items.foundlost_by = accounts.id;";
 
     con.query(sql, function (err, result) {
         if (err) throw err;
@@ -31,7 +31,15 @@ router.get('/', (req, res) => {
                 if (error) throw error;
                 if (results.length > 0) {
                     if (sessionBearerToken == results[0].token && results[0].permission <= 4) {
-                        res.json(result) // User Has Permission
+                        if (!(results[0].permission <= 3)) {
+                            const query = 'SELECT items.id, item_name, lost_since, image, status, accounts.username FROM `items` JOIN `accounts` ON items.foundlost_by = accounts.id WHERE items.status = "approved"';
+                            con.query(query, [], (error, results, fields) => {
+                                if (error) throw error;
+                                res.json(results)
+                            })
+                        } else {
+                            res.json(result) // User Has Permission
+                        }
                     } else {
                         res.status(403).json({
                             "status": "error",
@@ -72,7 +80,7 @@ router.get('/item', (req, res) => {
                 if (error) throw error;
                 if (results.length > 0) {
                     if (sessionBearerToken == results[0].token && results[0].permission <= 4) {
-                        res.json({...result[0], permissionLevel: results[0].permission}) // User Has Permission
+                        res.json({ ...result[0], permissionLevel: results[0].permission }) // User Has Permission
                     } else {
                         res.status(403).json({
                             "status": "error",
