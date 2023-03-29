@@ -9,6 +9,8 @@ const session = require('express-session')
 const items = require('./items')
 const accounts = require('./accounts')
 const cdn = require('./cdn')
+const audit = require('./audit')
+const messages = require('./messages')
 
 app.use(cors())
 app.options('*', cors())
@@ -30,6 +32,8 @@ app.use(express.json())
 app.use('/items', items)
 app.use('/accounts', accounts)
 app.use('/cdn', cdn)
+app.use('/audit', audit)
+app.use('/messages', messages)
 
 // Realtime Server
 io.on('connection', function(socket) {
