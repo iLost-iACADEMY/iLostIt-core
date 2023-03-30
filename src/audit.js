@@ -12,7 +12,19 @@ var con = mysql.createConnection({
     connectTimeout: 99999999
 });
 
-router.get('/', (req, res) => {
+router.get('/', (req, res) => 
+{
+    const que='INSERT INTO audit(action,act_by,description,dedicated_item,since) VALUES(${action},${actBy},${description},${dedicatedItem},${since})';
+    
+    connection.que(que,(err,result)=>
+    {
+        if (err) {
+            console.error('Error logging audit log', err);
+        } else {
+            console.log('Successfully logged audit log');
+        }
+
+    });
     
 })
 
