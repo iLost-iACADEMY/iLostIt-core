@@ -31,7 +31,7 @@ router.get('/list', (req, res) => {
                     if (results1.length > 0) {
                         var arrayput = []
 
-                        let hasId = function(arr, id){
+                        let hasId = function (arr, id) {
                             return arr.some(e => e.item === id);
                         };
 
@@ -43,6 +43,63 @@ router.get('/list', (req, res) => {
                                 arrayput.push(element)
                             }
                         });
+                        await res.json(arrayput)
+                    } else {
+                        await res.status(403).json({
+                            "status": "error",
+                            "message": "Forbidden"
+                        })
+                    }
+                })
+            } else {
+                res.status(403).json({
+                    "status": "error",
+                    "message": "Invalid token"
+                })
+            }
+        } else {
+            res.status(403).json({
+                "status": "error",
+                "message": "Forbidden"
+            })
+        }
+    })
+})
+
+router.get('/messages', (req, res) => {
+    con.connect()
+
+    session = req.headers['authorization']
+    sessionBearer = session.split(' ');
+    sessionBearerToken = sessionBearer[1];
+
+    const query = 'SELECT * FROM sessions JOIN accounts ON sessions.userkey = accounts.id WHERE token = ?';
+    con.query(query, [sessionBearerToken], (error, results, fields) => {
+        if (error) throw error;
+        if (results.length > 0) {
+            if (sessionBearerToken == results[0].token && results[0].permission <= 4) {
+                // User has Permission
+                const query = "SELECT messages.id, message, since, item, receiver, sender, accounts.username, items.item_name, items.image, accounts.id AS userid FROM messages JOIN accounts ON messages.receiver = accounts.id OR messages.sender = accounts.id JOIN items ON messages.item = items.id WHERE item = ? AND (sender = ? OR receiver = ?)"
+                con.query(query, [req.query.itemid, results[0].userkey, results[0].userkey], async (error, results1, fields) => {
+                    if (error) throw error;
+                    if (results1.length > 0) {
+                        var arrayput = []
+
+                        let hasId = function (arr, id) {
+                            return arr.some(e => e.userid === id);
+                        };
+
+                        await results1.forEach(element => {
+                            
+                            if (hasId(arrayput, element.userid)) {
+                                //arrayput.splice(arrayput.findIndex(item => item.userid === element.sender), 1)
+                                //arrayput.splice(arrayput.findIndex(item => item.userid === element.receiver), 1)
+                                arrayput.splice(arrayput.findIndex(item => item.userid !== element.userid), 1)
+                            }
+                            arrayput.push(element)
+                           
+                        });
+                        arrayput.splice(-1, 1);
                         await res.json(arrayput)
                     } else {
                         await res.status(403).json({
