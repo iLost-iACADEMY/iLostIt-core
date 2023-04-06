@@ -25,7 +25,7 @@ router.get('/list', (req, res) => {
         if (results.length > 0) {
             if (sessionBearerToken == results[0].token && results[0].permission <= 4) {
                 // User has Permission
-                const query = "SELECT messages.id, since, item, receiver, accounts.username, items.item_name, items.image FROM messages JOIN accounts ON messages.receiver = accounts.id OR messages.sender = accounts.id JOIN items ON messages.item = items.id WHERE sender = ? OR receiver = ?"
+                const query = "SELECT messages.id, since, item, receiver, accounts.username, accounts.id as accid, items.item_name, items.image FROM messages JOIN accounts ON messages.receiver = accounts.id OR messages.sender = accounts.id JOIN items ON messages.item = items.id WHERE sender = ? OR receiver = ?"
                 con.query(query, [results[0].userkey, results[0].userkey], async (error, results1, fields) => {
                     if (error) throw error;
                     if (results1.length > 0) {
