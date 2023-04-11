@@ -85,9 +85,9 @@ router.get('/item', (req, res) => {
                         con.query(query, [req.query.itemid], function (err, resdatafound) {
                             // User Has Permission
                             if (resdatafound.length > 0) {
-                                res.json({ ...result[0], permissionLevel: results[0].permission, founded: {founded: 1, ...resdatafound[0]} })
+                                res.json({ ...result[0], permissionLevel: results[0].permission, founded: { founded: 1, ...resdatafound[0] } })
                             } else {
-                                res.json({ ...result[0], permissionLevel: results[0].permission, founded: {founded: 0} })
+                                res.json({ ...result[0], permissionLevel: results[0].permission, founded: { founded: 0 } })
                             }
                         })
                     } else {
@@ -368,6 +368,56 @@ router.get('/me', (req, res) => {
         }
     })
 
+})
+
+router.post('/markfound', (req, res) => {
+    con.connect()
+    var sql = "SELECT items.id, item_name, lost_since, image, status, accounts.username FROM `items` JOIN `accounts` ON items.foundlost_by = accounts.id;";
+
+    con.query(sql, function (err, result) {
+        if (err) throw err;
+
+        try {
+            session = req.headers['authorization']
+            sessionBearer = session.split(' ');
+            sessionBearerToken = sessionBearer[1];
+
+            if (results.length > 0) {
+                if (sessionBearerToken == results[0].token && results[0].permission <= 4) {
+                    if (results[0].permission <= 3) {
+                        const query = "INSERT INTO `founded` (`item`, `founded`, `owner`) VALUES (?, ?, ?)"
+                        con.query(query, [req.body.itemid, 1, req.body.owner], function (err, result) {
+                            if (err) throw err;
+                            res.json({
+                                owner: req.body.owner
+                            })
+                        })
+                    } else {
+                        res.status(403).json({
+                            "status": "error",
+                            "message": "Forbidden"
+                        })
+                    }
+                } else {
+                    res.status(403).json({
+                        "status": "error",
+                        "message": "Forbidden"
+                    })
+                }
+            } else {
+                res.status(403).json({
+                    "status": "error",
+                    "message": "Forbidden"
+                })
+            }
+        }
+        catch (e) {
+            res.status(403).json({
+                "status": "error",
+                "message": "Forbidden"
+            })
+        }
+    })
 })
 
 module.exports = router
