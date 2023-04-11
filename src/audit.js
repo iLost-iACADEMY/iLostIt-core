@@ -13,13 +13,8 @@ var con = mysql.createConnection({
 });
 
 router.get('/', (req, res) => {
-
+    const sql = "SELECT * FROM "
 })
-
-module.exports.AddAudit = function AddAudit(action, actby, desc, deditem) {
-    const sql = "INSERT INTO `audit` (`action`, `act_by`, `description`, `dedicated_item`) VALUES (?, ?, ?, ?);"
-    con.query(sql, [action, actby, desc, deditem])
-}
 
 
 module.exports = router;

@@ -3,7 +3,6 @@ const router = express.Router()
 const mysqlconndet = require('./mysql.json')
 const mysql = require('mysql2')
 const multer = require('multer')
-const audit = require('./audit')
 
 var con = mysql.createConnection({
     host: mysqlconndet.serverhost,
@@ -13,6 +12,11 @@ var con = mysql.createConnection({
     port: mysqlconndet.port,
     connectTimeout: 0
 });
+
+function AddAudit(action, actby, desc, deditem) {
+    const sql = "INSERT INTO `audit` (`action`, `act_by`, `description`, `dedicated_item`) VALUES (?, ?, ?, ?);"
+    con.query(sql, [action, actby, desc, deditem])
+}
 
 router.get('/', (req, res) => {
     con.connect()
@@ -163,7 +167,7 @@ router.post('/add', uploadinit(), (req, res) => {
             con.query(sql, [req.body.item_name, genfoldimg, results[0].userkey, "pending"], function (err, result) {
                 if (err) throw err;
                 genfoldimg = makegenfoldimg(10)
-                audit.AddAudit("Add Item", results[0].userkey, req.body.item_name, result.insertId)
+                AddAudit("Add Item", results[0].userkey, req.body.item_name, result.insertId)
                 res.json({
                     "id": result.insertId,
                     "status": "success",
@@ -201,7 +205,7 @@ router.post('/approve', (req, res) => {
                             var sql = "UPDATE items SET status = 'approved' WHERE id = ?";
                             con.query(sql, [req.body.itemid], function (err, result) {
                                 if (err) throw err;
-                                audit.AddAudit("Approve Item", results[0].userkey, result.item_name, result.itemid)
+                                AddAudit("Approve Item", results[0].userkey, result.item_name, result.itemid)
                                 res.json({
                                     "status": "success",
                                     "message": "Approved Successfully!"
