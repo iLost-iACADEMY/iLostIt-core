@@ -80,7 +80,15 @@ router.get('/item', (req, res) => {
                 if (error) throw error;
                 if (results.length > 0) {
                     if (sessionBearerToken == results[0].token && results[0].permission <= 4) {
-                        res.json({ ...result[0], permissionLevel: results[0].permission }) // User Has Permission
+                        const query = 'SELECT * FROM founded WHERE item = ?'
+                        con.query(query, [req.query.itemid], function (err, resdatafound) {
+                            // User Has Permission
+                            if (resdatafound.length > 0) {
+                                res.json({ ...result[0], permissionLevel: results[0].permission, founded: {founded: 1, ...resdatafound[0]} })
+                            } else {
+                                res.json({ ...result[0], permissionLevel: results[0].permission, founded: {founded: 0} })
+                            }
+                        })
                     } else {
                         res.status(403).json({
                             "status": "error",
