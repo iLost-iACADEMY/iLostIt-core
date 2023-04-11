@@ -381,37 +381,44 @@ router.post('/markfound', (req, res) => {
             session = req.headers['authorization']
             sessionBearer = session.split(' ');
             sessionBearerToken = sessionBearer[1];
-
-            if (results.length > 0) {
-                if (sessionBearerToken == results[0].token && results[0].permission <= 4) {
-                    if (results[0].permission <= 3) {
-                        const query = "INSERT INTO `founded` (`item`, `founded`, `owner`) VALUES (?, ?, ?)"
-                        con.query(query, [req.body.itemid, 1, req.body.owner], function (err, result) {
-                            if (err) throw err;
-                            res.json({
-                                owner: req.body.owner
+            const query = 'SELECT * FROM sessions JOIN accounts ON sessions.userkey = accounts.id WHERE token = ?';
+            con.query(query, [sessionBearerToken], (error, results, fields) => {
+                if (error) throw error;
+                if (results.length > 0) {
+                    if (sessionBearerToken == results[0].token && results[0].permission <= 4) {
+                        if (results[0].permission <= 3) {
+                            const query = "INSERT INTO `founded` (`item`, `founded`, `owner`) VALUES (?, ?, ?)"
+                            con.query(query, [req.body.itemid, 1, req.body.owner], function (err, result) {
+                                if (err) throw err;
+                                res.json({
+                                    owner: req.body.owner
+                                })
                             })
-                        })
+                        } else {
+                            console.log(3)
+                            res.status(403).json({
+                                "status": "error",
+                                "message": "Forbidden"
+                            })
+                        }
                     } else {
+                        console.log(2)
                         res.status(403).json({
                             "status": "error",
                             "message": "Forbidden"
                         })
                     }
                 } else {
+                    console.log(1)
                     res.status(403).json({
                         "status": "error",
                         "message": "Forbidden"
                     })
                 }
-            } else {
-                res.status(403).json({
-                    "status": "error",
-                    "message": "Forbidden"
-                })
-            }
+            })
         }
         catch (e) {
+            console.log(e)
             res.status(403).json({
                 "status": "error",
                 "message": "Forbidden"
