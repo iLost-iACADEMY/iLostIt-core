@@ -201,6 +201,7 @@ router.post('/approve', (req, res) => {
                             var sql = "UPDATE items SET status = 'approved' WHERE id = ?";
                             con.query(sql, [req.body.itemid], function (err, result) {
                                 if (err) throw err;
+                                audit.AddAudit("Approve Item", results[0].userkey, result.item_name, result.itemid)
                                 res.json({
                                     "status": "success",
                                     "message": "Approved Successfully!"
