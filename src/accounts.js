@@ -11,7 +11,7 @@ var con = mysql.createConnection({
     password: mysqlconndet.password,
     database: mysqlconndet.database,
     port: mysqlconndet.port,
-    connectTimeout: 99999999
+    connectTimeout: 0
 });
 
 router.get('/', (req, res) => {
