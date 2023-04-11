@@ -12,8 +12,13 @@ var con = mysql.createConnection({
     connectTimeout: 99999999
 });
 
+router.get('/', (req, res) => {
+    
+})
+
 module.exports.AddAudit = function AddAudit(action, actby, desc, deditem) {
     const sql = "INSERT INTO `audit` (`action`, `act_by`, `description`, `dedicated_item`) VALUES (?, ?, ?, ?);"
+    con.query(sql, [action, actby, desc, deditem])
 }
 
 

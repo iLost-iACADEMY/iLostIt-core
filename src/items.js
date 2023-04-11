@@ -3,6 +3,7 @@ const router = express.Router()
 const mysqlconndet = require('./mysql.json')
 const mysql = require('mysql2')
 const multer = require('multer')
+const audit = require('./audit')
 
 var con = mysql.createConnection({
     host: mysqlconndet.serverhost,
@@ -162,6 +163,7 @@ router.post('/add', uploadinit(), (req, res) => {
             con.query(sql, [req.body.item_name, genfoldimg, results[0].userkey, "pending"], function (err, result) {
                 if (err) throw err;
                 genfoldimg = makegenfoldimg(10)
+                audit.AddAudit("Add Item", results[0].userkey, req.body.item_name, result.insertId)
                 res.json({
                     "id": result.insertId,
                     "status": "success",
