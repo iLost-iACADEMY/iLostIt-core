@@ -14,6 +14,11 @@ var con = mysql.createConnection({
     connectTimeout: 0
 });
 
+function AddAudit(action, actby, desc, deditem) {
+    const sql = "INSERT INTO `audit` (`action`, `act_by`, `description`, `dedicated_item`) VALUES (?, ?, ?, ?);"
+    con.query(sql, [action, actby, desc, deditem])
+}
+
 router.get('/', (req, res) => {
     con.connect()
 
@@ -144,7 +149,11 @@ router.post('/register', (req, res) => {
     if (password == confirmpassword) {
         con.query(query, [username, hash, "4"], (error, results, fields) => {
             if (error) throw error;
-            res.json("Registered! Welcome to iLost");
+            const query = "SELECT * FROM accounts WHERE id = ?"
+            con.query(query, [results.insertId], (err, resultuser) => {
+                AddAudit("New Account", resultuser[0].id, resultuser[0].username, null)
+                res.json("Registered! Welcome to iLost");
+            }) 
         })
     } else {
         res.status(403).json("Password doesn't match")
