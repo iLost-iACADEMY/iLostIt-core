@@ -32,7 +32,7 @@ router.get('/', (req, res) => {
                 if (results.length > 0) {
                     if (sessionBearerToken == results[0].token && results[0].permission <= 4) {
                         if (!(results[0].permission <= 3)) {
-                            const query = 'SELECT items.id, item_name, lost_since, image, status, accounts.username FROM `items` JOIN `accounts` ON items.foundlost_by = accounts.id WHERE items.status = "approved"';
+                            const query = 'SELECT items.id, item_name, lost_since, image, status, accounts.username FROM `items` JOIN `accounts` ON items.foundlost_by = accounts.id LEFT JOIN `founded` ON items.id = founded.item WHERE items.status = "approved" AND founded.id is NULL';
                             con.query(query, [], (error, results, fields) => {
                                 if (error) throw error;
                                 res.json(results)
