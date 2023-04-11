@@ -254,12 +254,17 @@ router.delete('/delete', (req, res) => {
                 if (error) throw error;
                 if (results.length > 0) {
                     if (sessionBearerToken == results[0].token && results[0].permission <= 4 && (results[0].userkey == result[0].foundlost_by || results[0].permission <= 3)) {
-                        var sql = "DELETE FROM items WHERE id = ?";
-                        con.query(sql, [req.body.itemid], function (err, result) {
+                        var sql = "SELECT * FROM items JOIN accounts ON items.foundlost_by = accounts.id WHERE items.id = ?"
+                        con.query(sql, [req.body.itemid], async (error, resultsitem, fields) => {
                             if (err) throw err;
-                            res.json({
-                                "status": "success",
-                                "message": "Deleted Successfully!"
+                            var sql = "DELETE FROM items WHERE id = ?";
+                            AddAudit("Delete Item", results[0].userkey, "Deleted " + resultsitem[0].item_name + " by " + resultsitem[0].username, null)
+                            con.query(sql, [req.body.itemid], function (err, result) {
+                                if (err) throw err;
+                                res.json({
+                                    "status": "success",
+                                    "message": "Deleted Successfully!"
+                                })
                             })
                         })
                     } else {
