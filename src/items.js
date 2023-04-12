@@ -163,8 +163,8 @@ router.post('/add', uploadinit(), (req, res) => {
         const query = 'SELECT * FROM sessions JOIN accounts ON sessions.userkey = accounts.id WHERE token = ?';
         con.query(query, [sessionBearerToken], (error, results, fields) => {
 
-            var sql = "INSERT INTO `items` (item_name, image, foundlost_by, status) VALUES (?, ?, ?, ?)";
-            con.query(sql, [req.body.item_name, genfoldimg, results[0].userkey, "pending"], function (err, result) {
+            var sql = "INSERT INTO `items` (item_name, image, foundlost_by, tags, status) VALUES (?, ?, ?, ?, ?)";
+            con.query(sql, [req.body.item_name, genfoldimg, results[0].userkey, req.body.tag, "pending"], function (err, result) {
                 if (err) throw err;
                 genfoldimg = makegenfoldimg(10)
                 AddAudit("Add Item", results[0].userkey, req.body.item_name, result.insertId)
