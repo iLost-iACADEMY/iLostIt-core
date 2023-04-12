@@ -205,10 +205,14 @@ router.post('/approve', (req, res) => {
                             var sql = "UPDATE items SET status = 'approved' WHERE id = ?";
                             con.query(sql, [req.body.itemid], function (err, result) {
                                 if (err) throw err;
-                                AddAudit("Approve Item", results[0].userkey, result.item_name, result.itemid)
-                                res.json({
-                                    "status": "success",
-                                    "message": "Approved Successfully!"
+                                var sql = "SELECT * FROM items WHERE id = ?"
+                                con.query(sql, [req.body.itemid], function (err, result) {
+                                    if (err) throw err;
+                                    AddAudit("Approve Item", results[0].userkey, result[0].item_name, req.body.itemid)
+                                    res.json({
+                                        "status": "success",
+                                        "message": "Approved Successfully!"
+                                    })
                                 })
                             })
                         } else {
