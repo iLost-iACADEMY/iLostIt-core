@@ -50,5 +50,38 @@ router.get('/', (req, res) => {
 
 })
 
+router.get('/csv', (req, res) => {
+    session = req.headers['authorization']
+    sessionBearer = session.split(' ');
+    sessionBearerToken = sessionBearer[1];
+
+    const query = 'SELECT * FROM sessions JOIN accounts ON sessions.userkey = accounts.id WHERE token = ?';
+    con.query(query, [sessionBearerToken], (error, results, fields) => {
+        if (error) throw error;
+        if (results.length > 0) {
+            if (sessionBearerToken == results[0].token && results[0].permission <= 4) {
+                if (results[0].permission <= 3) {
+                    // TODO: Export iLost Data Audit as CSV
+                } else {
+                    res.status(403).json({
+                        "status": "error",
+                        "message": "Forbidden"
+                    })
+                }
+            } else {
+                res.status(403).json({
+                    "status": "error",
+                    "message": "Forbidden"
+                })
+            }
+        } else {
+            res.status(403).json({
+                "status": "error",
+                "message": "No items"
+            })
+        }
+    })
+})
+
 
 module.exports = router;

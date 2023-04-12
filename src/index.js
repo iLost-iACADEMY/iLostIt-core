@@ -35,6 +35,8 @@ app.use('/cdn', cdn)
 app.use('/audit', audit)
 app.use('/messages', messages)
 
+// TODO: SELECT * FROM items WHERE lost_since < DATE_SUB(now(), INTERVAL 6 MONTH); Every 15 seconds
+
 // Realtime Server
 io.on('connection', function(socket) {
   console.log('A user connected');
