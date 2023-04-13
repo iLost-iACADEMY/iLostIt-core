@@ -21,7 +21,7 @@ function AddAudit(action, actby, desc, deditem) {
 router.get('/', (req, res) => {
     con.connect()
 
-    var sql = "SELECT items.id, item_name, lost_since, image, status, accounts.username FROM `items` JOIN `accounts` ON items.foundlost_by = accounts.id;";
+    var sql = "SELECT items.id, item_name, lost_since, image, status, tags, accounts.username FROM `items` JOIN `accounts` ON items.foundlost_by = accounts.id;";
 
     con.query(sql, function (err, result) {
         if (err) throw err;
@@ -36,14 +36,23 @@ router.get('/', (req, res) => {
                 if (error) throw error;
                 if (results.length > 0) {
                     if (sessionBearerToken == results[0].token && results[0].permission <= 4) {
+
+                        function ReturnWithSort() {
+                            if (req.query.tag == "All" && req.query.status == "All") {
+                                res.json(result)
+                            } else {
+                                res.json(result)
+                            }
+                        }
+
                         if (!(results[0].permission <= 3)) {
-                            const query = 'SELECT items.id, item_name, lost_since, image, status, accounts.username FROM `items` JOIN `accounts` ON items.foundlost_by = accounts.id LEFT JOIN `founded` ON items.id = founded.item WHERE items.status = "approved" AND founded.id is NULL';
+                            const query = 'SELECT items.id, item_name, lost_since, image, status, tags, accounts.username FROM `items` JOIN `accounts` ON items.foundlost_by = accounts.id LEFT JOIN `founded` ON items.id = founded.item WHERE items.status = "approved" AND founded.id is NULL';
                             con.query(query, [], (error, results, fields) => {
                                 if (error) throw error;
-                                res.json(results)
+                                ReturnWithSort()
                             })
                         } else {
-                            res.json(result) // User Has Permission
+                            ReturnWithSort() // User Has Permission
                         }
                     } else {
                         res.status(403).json({
