@@ -37,11 +37,53 @@ router.get('/', (req, res) => {
                 if (results.length > 0) {
                     if (sessionBearerToken == results[0].token && results[0].permission <= 4) {
 
-                        function ReturnWithSort() {
+                        function ReturnWithSort(resu, admin) {
                             if (req.query.tag == "All" && req.query.status == "All") {
-                                res.json(result)
+                                res.json(resu)
                             } else {
-                                res.json(result)
+                                if (admin) {
+                                    var initsql = 'SELECT items.id, item_name, lost_since, image, status, tags, accounts.username FROM `items` JOIN `accounts` ON items.foundlost_by = accounts.id LEFT JOIN `founded` ON items.id = founded.item WHERE items.status = "approved" AND founded.id is NULL'
+                                    if (req.query.tag == "All") {
+                                        const sql = initsql + ' AND items.status = ?';
+                                        con.query(sql, [req.query.tag, req.query.status], (error, results, fields) => {
+                                            if (error) throw error;
+                                            res.json(results)
+                                        })
+                                    } else if (req.query.status == "All") {
+                                        const sql = initsql + ' AND items.tags = ?';
+                                        con.query(sql, [req.query.tag, req.query.status], (error, results, fields) => {
+                                            if (error) throw error;
+                                            res.json(results)
+                                        })
+                                    } else {
+                                        const sql = initsql + ' AND items.tags = ? AND items.status = ?';
+                                        con.query(sql, [req.query.tag, req.query.status], (error, results, fields) => {
+                                            if (error) throw error;
+                                            res.json(results)
+                                        })
+                                    }
+                                } else {
+                                    var initsql = "SELECT items.id, item_name, lost_since, image, status, tags, accounts.username FROM `items` JOIN `accounts` ON items.foundlost_by = accounts.id"
+                                    if (req.query.tag == "All") {
+                                        var sql = initsql + " AND items.status = ?";
+                                        con.query(sql, [req.query.tag, req.query.status], (error, results, fields) => {
+                                            if (error) throw error;
+                                            res.json(results)
+                                        })
+                                    } else if (req.query.status == "All") {
+                                        var sql = initsql + " AND items.tags = ?";
+                                        con.query(sql, [req.query.tag, req.query.status], (error, results, fields) => {
+                                            if (error) throw error;
+                                            res.json(results)
+                                        })
+                                    } else {
+                                        var sql = initsql + " AND items.tags = ? AND items.status = ?";
+                                        con.query(sql, [req.query.tag, req.query.status], (error, results, fields) => {
+                                            if (error) throw error;
+                                            res.json(results)
+                                        })
+                                    }
+                                }
                             }
                         }
 
@@ -49,10 +91,10 @@ router.get('/', (req, res) => {
                             const query = 'SELECT items.id, item_name, lost_since, image, status, tags, accounts.username FROM `items` JOIN `accounts` ON items.foundlost_by = accounts.id LEFT JOIN `founded` ON items.id = founded.item WHERE items.status = "approved" AND founded.id is NULL';
                             con.query(query, [], (error, results, fields) => {
                                 if (error) throw error;
-                                ReturnWithSort()
+                                ReturnWithSort(results, true)
                             })
                         } else {
-                            ReturnWithSort() // User Has Permission
+                            ReturnWithSort(result, false) // User Has Permission
                         }
                     } else {
                         res.status(403).json({
