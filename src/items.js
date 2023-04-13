@@ -43,15 +43,15 @@ router.get('/', (req, res) => {
                             } else {
                                 if (admin) {
                                     var initsql = 'SELECT items.id, item_name, lost_since, image, status, tags, accounts.username FROM `items` JOIN `accounts` ON items.foundlost_by = accounts.id LEFT JOIN `founded` ON items.id = founded.item WHERE items.status = "approved" AND founded.id is NULL'
-                                    if (req.query.tag == "All") {
-                                        const sql = initsql + ' AND items.status = ?';
-                                        con.query(sql, [req.query.tag, req.query.status], (error, results, fields) => {
+                                    if (req.query.status == "All") {
+                                        const sql = initsql + ' AND items.tags = ?';
+                                        con.query(sql, [req.query.tag], (error, results, fields) => {
                                             if (error) throw error;
                                             res.json(results)
                                         })
-                                    } else if (req.query.status == "All") {
-                                        const sql = initsql + ' AND items.tags = ?';
-                                        con.query(sql, [req.query.tag, req.query.status], (error, results, fields) => {
+                                    } else if (req.query.tag == "All") {
+                                        const sql = initsql + ' AND items.status = ?';
+                                        con.query(sql, [req.query.status], (error, results, fields) => {
                                             if (error) throw error;
                                             res.json(results)
                                         })
@@ -64,15 +64,15 @@ router.get('/', (req, res) => {
                                     }
                                 } else {
                                     var initsql = "SELECT items.id, item_name, lost_since, image, status, tags, accounts.username FROM `items` JOIN `accounts` ON items.foundlost_by = accounts.id"
-                                    if (req.query.tag == "All") {
-                                        var sql = initsql + " AND items.status = ?";
-                                        con.query(sql, [req.query.tag, req.query.status], (error, results, fields) => {
+                                    if (req.query.status == "All") {
+                                        var sql = initsql + " AND items.tags = ?";
+                                        con.query(sql, [req.query.tag], (error, results, fields) => {
                                             if (error) throw error;
                                             res.json(results)
                                         })
-                                    } else if (req.query.status == "All") {
-                                        var sql = initsql + " AND items.tags = ?";
-                                        con.query(sql, [req.query.tag, req.query.status], (error, results, fields) => {
+                                    } else if (req.query.tag == "All") {
+                                        var sql = initsql + " AND items.status = ?";
+                                        con.query(sql, [req.query.status], (error, results, fields) => {
                                             if (error) throw error;
                                             res.json(results)
                                         })
