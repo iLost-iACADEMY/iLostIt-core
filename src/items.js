@@ -63,25 +63,41 @@ router.get('/', (req, res) => {
                                         })
                                     }
                                 } else {
-                                    var initsql = "SELECT items.id, item_name, lost_since, image, status, tags, accounts.username FROM `items` JOIN `accounts` ON items.foundlost_by = accounts.id"
+                                    var initsql = 'SELECT items.id, item_name, lost_since, image, status, tags, accounts.username FROM `items` JOIN `accounts` ON items.foundlost_by = accounts.id LEFT JOIN `founded` ON items.id = founded.item WHERE'
                                     if (req.query.status == "All") {
-                                        var sql = initsql + " AND items.tags = ?";
+                                        var sql = initsql + " items.tags = ?";
                                         con.query(sql, [req.query.tag], (error, results, fields) => {
                                             if (error) throw error;
                                             res.json(results)
                                         })
                                     } else if (req.query.tag == "All") {
-                                        var sql = initsql + " AND items.status = ?";
-                                        con.query(sql, [req.query.status], (error, results, fields) => {
-                                            if (error) throw error;
-                                            res.json(results)
-                                        })
+                                        if (req.query.status == "approved_founded") {
+                                            var sql = initsql + " founded.item IS NOT NULL AND items.status = 'approved'";
+                                            con.query(sql, (error, results, fields) => {
+                                                if (error) throw error;
+                                                res.json(results)
+                                            })
+                                        } else {
+                                            var sql = initsql + " items.status = ?";
+                                            con.query(sql, [req.query.status], (error, results, fields) => {
+                                                if (error) throw error;
+                                                res.json(results)
+                                            })
+                                        }
                                     } else {
-                                        var sql = initsql + " AND items.tags = ? AND items.status = ?";
-                                        con.query(sql, [req.query.tag, req.query.status], (error, results, fields) => {
-                                            if (error) throw error;
-                                            res.json(results)
-                                        })
+                                        if (req.query.status == "approved_founded") {
+                                            var sql = initsql + " founded.item IS NOT NULL AND items.tags = ?";
+                                            con.query(sql, [req.query.tag], (error, results, fields) => {
+                                                if (error) throw error;
+                                                res.json(results)
+                                            })
+                                        } else {
+                                            var sql = initsql + " items.tags = ? AND items.status = ?";
+                                            con.query(sql, [req.query.tag, req.query.status], (error, results, fields) => {
+                                                if (error) throw error;
+                                                res.json(results)
+                                            })
+                                        }
                                     }
                                 }
                             }
