@@ -110,7 +110,7 @@ router.post('/login', (req, res) => {
             if (bcrypt.compareSync(password, results[0].password)) {
                 const query = 'INSERT INTO sessions (userkey, token, sha) VALUES(?, ?, ?)';
                 const shad = makesha(5);
-                const token =  encrypt("ilost", results[0].username + '+' + results[0].permission + '+' + shad);
+                const token = encrypt("ilost", results[0].username + '+' + results[0].permission + '+' + shad);
 
                 con.query(query, [results[0].id, token, shad], (error, results1, fields) => {
                     if (error) throw error;
@@ -153,11 +153,52 @@ router.post('/register', (req, res) => {
             con.query(query, [results.insertId], (err, resultuser) => {
                 AddAudit("New Account", resultuser[0].id, resultuser[0].username, null)
                 res.json("Registered! Welcome to iLost");
-            }) 
+            })
         })
     } else {
         res.status(403).json("Password doesn't match")
     }
+})
+
+router.post('/register/admin', (req, res) => {
+    con.connect()
+
+    session = req.headers['authorization']
+    sessionBearer = session.split(' ');
+    sessionBearerToken = sessionBearer[1];
+
+    const query = 'SELECT * FROM sessions JOIN accounts ON sessions.userkey = accounts.id WHERE token = ?';
+    con.query(query, [sessionBearerToken], (error, results, fields) => {
+        if (error) throw error;
+        if (results.length > 0) {
+            if (sessionBearerToken == results[0].token && results[0].permission < 2) {
+
+                var salt = bcrypt.genSaltSync(10);
+                var hash = bcrypt.hashSync(req.body.password, salt);
+
+                const { username, password } = req.body
+                const query = 'INSERT INTO accounts (username, password, permission) VALUES(?, ?, ?)';
+                con.query(query, [username, hash, "2"], (error, results, fields) => {
+                    if (error) throw error;
+                    const query = "SELECT * FROM accounts WHERE id = ?"
+                    con.query(query, [results.insertId], (err, resultuser) => {
+                        AddAudit("New Admin Account", resultuser[0].id, resultuser[0].username, null)
+                        res.json("Admin successfully registered");
+                    })
+                })
+            } else {
+                res.status(403).json({
+                    "status": "error",
+                    "message": "Invalid token"
+                })
+            }
+        } else {
+            res.status(403).json({
+                "status": "error",
+                "message": "Forbidden"
+            })
+        }
+    })
 })
 
 module.exports = router

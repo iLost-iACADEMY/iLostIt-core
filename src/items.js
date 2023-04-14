@@ -21,7 +21,7 @@ function AddAudit(action, actby, desc, deditem) {
 router.get('/', (req, res) => {
     con.connect()
 
-    var sql = "SELECT items.id, item_name, lost_since, image, status, tags, accounts.username FROM `items` JOIN `accounts` ON items.foundlost_by = accounts.id;";
+    var sql = "SELECT items.id, item_name, lost_since, image, status, tags, COALESCE(founded.founded, 0) AS founded, accounts.username FROM `items` JOIN `accounts` ON items.foundlost_by = accounts.id LEFT JOIN `founded` ON items.id = founded.item;";
 
     con.query(sql, function (err, result) {
         if (err) throw err;
@@ -42,7 +42,7 @@ router.get('/', (req, res) => {
                                 res.json(resu)
                             } else {
                                 if (admin) {
-                                    var initsql = 'SELECT items.id, item_name, lost_since, image, status, tags, accounts.username FROM `items` JOIN `accounts` ON items.foundlost_by = accounts.id LEFT JOIN `founded` ON items.id = founded.item WHERE items.status = "approved" AND founded.id is NULL'
+                                    var initsql = 'SELECT items.id, item_name, lost_since, image, status, tags, COALESCE(founded.founded, 0) AS founded, accounts.username FROM `items` JOIN `accounts` ON items.foundlost_by = accounts.id LEFT JOIN `founded` ON items.id = founded.item WHERE items.status = "approved" AND founded.id is NULL'
                                     if (req.query.status == "All") {
                                         const sql = initsql + ' AND items.tags = ?';
                                         con.query(sql, [req.query.tag], (error, results, fields) => {
@@ -63,7 +63,7 @@ router.get('/', (req, res) => {
                                         })
                                     }
                                 } else {
-                                    var initsql = 'SELECT items.id, item_name, lost_since, image, status, tags, accounts.username FROM `items` JOIN `accounts` ON items.foundlost_by = accounts.id LEFT JOIN `founded` ON items.id = founded.item WHERE'
+                                    var initsql = 'SELECT items.id, item_name, lost_since, image, status, tags, COALESCE(founded.founded, 0) AS founded, accounts.username FROM `items` JOIN `accounts` ON items.foundlost_by = accounts.id LEFT JOIN `founded` ON items.id = founded.item WHERE'
                                     if (req.query.status == "All") {
                                         var sql = initsql + " items.tags = ?";
                                         con.query(sql, [req.query.tag], (error, results, fields) => {
@@ -104,7 +104,7 @@ router.get('/', (req, res) => {
                         }
 
                         if (!(results[0].permission <= 3)) {
-                            const query = 'SELECT items.id, item_name, lost_since, image, status, tags, accounts.username FROM `items` JOIN `accounts` ON items.foundlost_by = accounts.id LEFT JOIN `founded` ON items.id = founded.item WHERE items.status = "approved" AND founded.id is NULL';
+                            const query = 'SELECT items.id, item_name, lost_since, image, status, tags, COALESCE(founded.founded, 0) AS founded, accounts.username FROM `items` JOIN `accounts` ON items.foundlost_by = accounts.id LEFT JOIN `founded` ON items.id = founded.item WHERE items.status = "approved" AND founded.id is NULL';
                             con.query(query, [], (error, results, fields) => {
                                 if (error) throw error;
                                 ReturnWithSort(results, true)
