@@ -183,8 +183,39 @@ router.post('/register/admin', (req, res) => {
                     const query = "SELECT * FROM accounts WHERE id = ?"
                     con.query(query, [results.insertId], (err, resultuser) => {
                         AddAudit("New Admin Account", resultuser[0].id, resultuser[0].username, null)
-                        res.json("Admin successfully registered");
+                        res.json({id: results.insertId});
                     })
+                })
+            } else {
+                res.status(403).json({
+                    "status": "error",
+                    "message": "Invalid token"
+                })
+            }
+        } else {
+            res.status(403).json({
+                "status": "error",
+                "message": "Forbidden"
+            })
+        }
+    })
+})
+
+router.get('/adminlist', (req, res) => {
+    con.connect()
+
+    session = req.headers['authorization']
+    sessionBearer = session.split(' ');
+    sessionBearerToken = sessionBearer[1];
+
+    const query = 'SELECT * FROM sessions JOIN accounts ON sessions.userkey = accounts.id WHERE token = ?';
+    con.query(query, [sessionBearerToken], (error, results, fields) => {
+        if (error) throw error;
+        if (results.length > 0) {
+            if (sessionBearerToken == results[0].token && results[0].permission < 2) {
+                const query = "SELECT * FROM accounts WHERE permission < 4 AND id != ?"
+                con.query(query, "1", (err, resultuser) => {
+                    res.json(resultuser);
                 })
             } else {
                 res.status(403).json({
