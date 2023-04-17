@@ -263,4 +263,45 @@ router.post('/delete/admin', (req, res) => {
     })
 })
 
+router.post('/changepassword/admin', (req, res) => {
+    con.connect()
+
+    session = req.headers['authorization']
+    sessionBearer = session.split(' ');
+    sessionBearerToken = sessionBearer[1];
+
+    const query = 'SELECT * FROM sessions JOIN accounts ON sessions.userkey = accounts.id WHERE token = ?';
+    con.query(query, [sessionBearerToken], (error, results, fields) => {
+        if (error) throw error;
+        if (results.length > 0) {
+
+            var salt = bcrypt.genSaltSync(10);
+            var hash = bcrypt.hashSync(req.body.newpassword, salt);
+
+            const query = "SELECT * FROM accounts WHERE id = 1"
+            con.query(query, (error, results) => {
+                if (bcrypt.compareSync(req.body.oldpwd, results[0].password)) {
+                    const query = "UPDATE accounts SET password = ? WHERE id = 1"
+                    con.query(query, [hash], (error, results) => {
+                        res.json("Successfully changed Admin password");
+                    })
+                } else {
+                    res.status(403).json({
+                        "status": "error",
+                        "message": "Wrong Old Password"
+                    })
+                }
+            })
+
+            const { oldpwd, newpassword } = req.body
+
+        } else {
+            res.status(403).json({
+                "status": "error",
+                "message": "Forbidden"
+            })
+        }
+    })
+})
+
 module.exports = router
