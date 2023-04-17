@@ -508,4 +508,35 @@ router.post('/markfound', (req, res) => {
     })
 })
 
+router.get('/countitems', async (req, res) => {
+    con.connect()
+    const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
+    var tags = [
+        "Electronics",
+        "Books and Notebooks",
+        "Clothing",
+        "Writing Materials",
+        "Instruments",
+        "Other"
+    ]
+    var tagcount = []
+    await tags.forEach(element => {
+        const query = `SELECT COUNT(tags) AS counted FROM items LEFT JOIN founded ON items.id = founded.item WHERE items.tags = ? AND founded.id is NULL AND items.status = 'pending'`
+        con.query(query, [element], (err, resu) => {
+            tagcount.push(resu[0].counted)
+        })
+    });
+    await delay(2000)
+    await res.json({
+        "tags": {
+            "Electronics": tagcount[0],
+            "Books and Notebooks": tagcount[1],
+            "Clothing": tagcount[2],
+            "Writing Materials": tagcount[3],
+            "Instruments": tagcount[4],
+            "Other": tagcount[5]
+        }
+    })
+})
+
 module.exports = router
