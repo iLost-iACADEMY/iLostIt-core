@@ -513,15 +513,15 @@ router.get('/countitems', async (req, res) => {
     const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
     var tags = [
         "Electronics",
-        "Books and Notebooks",
+        "Books_and_Notebooks",
         "Clothing",
-        "Writing Materials",
+        "Writing_Materials",
         "Instruments",
         "Other"
     ]
     var tagcount = []
     await tags.forEach(element => {
-        const query = `SELECT COUNT(tags) AS counted FROM items LEFT JOIN founded ON items.id = founded.item WHERE items.tags = ? AND founded.id is NULL AND items.status = 'pending'`
+        const query = `SELECT COUNT(tags) AS counted FROM items LEFT JOIN founded ON items.id = founded.item WHERE items.tags = ? AND founded.id is NULL AND items.status = 'approved'`
         con.query(query, [element], (err, resu) => {
             tagcount.push(resu[0].counted)
         })
