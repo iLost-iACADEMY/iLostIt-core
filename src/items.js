@@ -3,6 +3,7 @@ const router = express.Router()
 const mysqlconndet = require('./mysql.json')
 const mysql = require('mysql2')
 const multer = require('multer')
+var data_exporter = require('json2csv').Parser;
 
 var con = mysql.createConnection({
     host: mysqlconndet.serverhost,
@@ -597,6 +598,210 @@ router.get('/countitems/founded', async (req, res) => {
             "Writing Materials": tagcount[3],
             "Instruments": tagcount[4],
             "Other": tagcount[5]
+        }
+    })
+})
+
+router.get('/csv', (req, res) => {
+    session = req.headers['authorization']
+    sessionBearer = session.split(' ');
+    sessionBearerToken = sessionBearer[1];
+
+    const query = 'SELECT * FROM sessions JOIN accounts ON sessions.userkey = accounts.id WHERE token = ?';
+    con.query(query, [sessionBearerToken], (error, results, fields) => {
+        if (error) throw error;
+        if (results.length > 0) {
+            if (sessionBearerToken == results[0].token && results[0].permission <= 4) {
+                if (results[0].permission <= 3) {
+                    // TODO: Export iLost Data Audit as CSV
+                    var sql = `SELECT items.item_name AS 'Item Name', items.lost_since AS 'Lost Since', accounts.username AS 'Founder', items.tags AS 'Tags', items.status AS 'Status' FROM items JOIN accounts ON items.foundlost_by = accounts.id;`
+                    con.query(sql, (err, resaudit) => {
+                        var mysql_data = JSON.parse(JSON.stringify(resaudit));
+
+                        //convert JSON to CSV Data
+
+                        var file_header = ['Item Name', 'Lost Since', 'Founder', 'Tags', 'Status'];
+
+                        var json_data = new data_exporter({ file_header });
+
+                        var csv_data = json_data.parse(mysql_data);
+
+                        res.setHeader("Content-Type", "text/csv");
+
+                        res.setHeader("Content-Disposition", "attachment; filename=ilost_items.csv");
+
+                        res.status(200).send(csv_data);
+                    })
+                } else {
+                    res.status(403).json({
+                        "status": "error",
+                        "message": "Forbidden"
+                    })
+                }
+            } else {
+                res.status(403).json({
+                    "status": "error",
+                    "message": "Forbidden"
+                })
+            }
+        } else {
+            res.status(403).json({
+                "status": "error",
+                "message": "No items"
+            })
+        }
+    })
+})
+
+router.get('/csv/approved', (req, res) => {
+    session = req.headers['authorization']
+    sessionBearer = session.split(' ');
+    sessionBearerToken = sessionBearer[1];
+
+    const query = 'SELECT * FROM sessions JOIN accounts ON sessions.userkey = accounts.id WHERE token = ?';
+    con.query(query, [sessionBearerToken], (error, results, fields) => {
+        if (error) throw error;
+        if (results.length > 0) {
+            if (sessionBearerToken == results[0].token && results[0].permission <= 4) {
+                if (results[0].permission <= 3) {
+                    // TODO: Export iLost Data Audit as CSV
+                    var sql = `SELECT items.item_name AS 'Item Name', items.lost_since AS 'Lost Since', accounts.username AS 'Founder', items.tags AS 'Tags', items.status AS 'Status' FROM items JOIN accounts ON items.foundlost_by = accounts.id WHERE items.status = 'approved';`
+                    con.query(sql, (err, resaudit) => {
+                        var mysql_data = JSON.parse(JSON.stringify(resaudit));
+
+                        //convert JSON to CSV Data
+
+                        var file_header = ['Item Name', 'Lost Since', 'Founder', 'Tags', 'Status'];
+
+                        var json_data = new data_exporter({ file_header });
+
+                        var csv_data = json_data.parse(mysql_data);
+
+                        res.setHeader("Content-Type", "text/csv");
+
+                        res.setHeader("Content-Disposition", "attachment; filename=ilost_items.csv");
+
+                        res.status(200).send(csv_data);
+                    })
+                } else {
+                    res.status(403).json({
+                        "status": "error",
+                        "message": "Forbidden"
+                    })
+                }
+            } else {
+                res.status(403).json({
+                    "status": "error",
+                    "message": "Forbidden"
+                })
+            }
+        } else {
+            res.status(403).json({
+                "status": "error",
+                "message": "No items"
+            })
+        }
+    })
+})
+
+router.get('/csv/pending', (req, res) => {
+    session = req.headers['authorization']
+    sessionBearer = session.split(' ');
+    sessionBearerToken = sessionBearer[1];
+
+    const query = 'SELECT * FROM sessions JOIN accounts ON sessions.userkey = accounts.id WHERE token = ?';
+    con.query(query, [sessionBearerToken], (error, results, fields) => {
+        if (error) throw error;
+        if (results.length > 0) {
+            if (sessionBearerToken == results[0].token && results[0].permission <= 4) {
+                if (results[0].permission <= 3) {
+                    // TODO: Export iLost Data Audit as CSV
+                    var sql = `SELECT items.item_name AS 'Item Name', items.lost_since AS 'Lost Since', accounts.username AS 'Founder', items.tags AS 'Tags', items.status AS 'Status' FROM items JOIN accounts ON items.foundlost_by = accounts.id WHERE items.status = 'pending';`
+                    con.query(sql, (err, resaudit) => {
+                        var mysql_data = JSON.parse(JSON.stringify(resaudit));
+
+                        //convert JSON to CSV Data
+
+                        var file_header = ['Item Name', 'Lost Since', 'Founder', 'Tags', 'Status'];
+
+                        var json_data = new data_exporter({ file_header });
+
+                        var csv_data = json_data.parse(mysql_data);
+
+                        res.setHeader("Content-Type", "text/csv");
+
+                        res.setHeader("Content-Disposition", "attachment; filename=ilost_items.csv");
+
+                        res.status(200).send(csv_data);
+                    })
+                } else {
+                    res.status(403).json({
+                        "status": "error",
+                        "message": "Forbidden"
+                    })
+                }
+            } else {
+                res.status(403).json({
+                    "status": "error",
+                    "message": "Forbidden"
+                })
+            }
+        } else {
+            res.status(403).json({
+                "status": "error",
+                "message": "No items"
+            })
+        }
+    })
+})
+
+router.get('/csv/founded', (req, res) => {
+    session = req.headers['authorization']
+    sessionBearer = session.split(' ');
+    sessionBearerToken = sessionBearer[1];
+
+    const query = 'SELECT * FROM sessions JOIN accounts ON sessions.userkey = accounts.id WHERE token = ?';
+    con.query(query, [sessionBearerToken], (error, results, fields) => {
+        if (error) throw error;
+        if (results.length > 0) {
+            if (sessionBearerToken == results[0].token && results[0].permission <= 4) {
+                if (results[0].permission <= 3) {
+                    // TODO: Export iLost Data Audit as CSV
+                    var sql = `SELECT items.item_name AS 'Item Name', items.lost_since AS 'Lost Since', accounts.username AS 'Founder', items.tags AS 'Tags', items.status AS 'Status' FROM items JOIN accounts ON items.foundlost_by = accounts.id LEFT JOIN founded ON items.id = founded.item WHERE items.status = 'approved' AND founded.founded = 1;`
+                    con.query(sql, (err, resaudit) => {
+                        var mysql_data = JSON.parse(JSON.stringify(resaudit));
+
+                        //convert JSON to CSV Data
+
+                        var file_header = ['Item Name', 'Lost Since', 'Founder', 'Tags', 'Status'];
+
+                        var json_data = new data_exporter({ file_header });
+
+                        var csv_data = json_data.parse(mysql_data);
+
+                        res.setHeader("Content-Type", "text/csv");
+
+                        res.setHeader("Content-Disposition", "attachment; filename=ilost_items.csv");
+
+                        res.status(200).send(csv_data);
+                    })
+                } else {
+                    res.status(403).json({
+                        "status": "error",
+                        "message": "Forbidden"
+                    })
+                }
+            } else {
+                res.status(403).json({
+                    "status": "error",
+                    "message": "Forbidden"
+                })
+            }
+        } else {
+            res.status(403).json({
+                "status": "error",
+                "message": "No items"
+            })
         }
     })
 })
