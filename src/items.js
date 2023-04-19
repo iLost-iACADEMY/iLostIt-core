@@ -708,7 +708,7 @@ router.get('/csv/approved', (req, res) => {
             if (sessionBearerToken == results[0].token && results[0].permission <= 4) {
                 if (results[0].permission <= 3) {
                     // TODO: Export iLost Data Audit as CSV
-                    var sql = `SELECT items.item_name AS 'Item Name', items.lost_since AS 'Lost Since', accounts.username AS 'Founder', items.tags AS 'Tags', items.status AS 'Status' FROM items JOIN accounts ON items.foundlost_by = accounts.id LEFT JOIN 'founded' ON items.id = founded.item WHERE items.status = 'approved' AND founded.id is NULL;`
+                    var sql = `SELECT items.item_name AS 'Item Name', items.lost_since AS 'Lost Since', accounts.username AS 'Founder', items.tags AS 'Tags', items.status AS 'Status' FROM items JOIN accounts ON items.foundlost_by = accounts.id LEFT JOIN founded ON items.id = founded.item WHERE items.status = 'approved' AND founded.id is NULL;`
                     con.query(sql, (err, resaudit) => {
                         var mysql_data = JSON.parse(JSON.stringify(resaudit));
 
