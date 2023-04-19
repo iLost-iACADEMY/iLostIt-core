@@ -78,6 +78,12 @@ router.get('/', (req, res) => {
                                                 if (error) throw error;
                                                 res.json(results)
                                             })
+                                        } else if (req.query.status == "approved") {
+                                            var sql = initsql + " founded.item IS NULL AND items.status = 'approved'";
+                                            con.query(sql, (error, results, fields) => {
+                                                if (error) throw error;
+                                                res.json(results)
+                                            })
                                         } else {
                                             var sql = initsql + " items.status = ?";
                                             con.query(sql, [req.query.status], (error, results, fields) => {
@@ -88,6 +94,12 @@ router.get('/', (req, res) => {
                                     } else {
                                         if (req.query.status == "approved_founded") {
                                             var sql = initsql + " founded.item IS NOT NULL AND items.tags = ?";
+                                            con.query(sql, [req.query.tag], (error, results, fields) => {
+                                                if (error) throw error;
+                                                res.json(results)
+                                            })
+                                        } else if (req.query.status == "approved") {
+                                            var sql = initsql + " founded.item IS NULL AND items.status = 'approved' AND items.tags = ?";
                                             con.query(sql, [req.query.tag], (error, results, fields) => {
                                                 if (error) throw error;
                                                 res.json(results)
@@ -696,7 +708,7 @@ router.get('/csv/approved', (req, res) => {
             if (sessionBearerToken == results[0].token && results[0].permission <= 4) {
                 if (results[0].permission <= 3) {
                     // TODO: Export iLost Data Audit as CSV
-                    var sql = `SELECT items.item_name AS 'Item Name', items.lost_since AS 'Lost Since', accounts.username AS 'Founder', items.tags AS 'Tags', items.status AS 'Status' FROM items JOIN accounts ON items.foundlost_by = accounts.id WHERE items.status = 'approved';`
+                    var sql = `SELECT items.item_name AS 'Item Name', items.lost_since AS 'Lost Since', accounts.username AS 'Founder', items.tags AS 'Tags', items.status AS 'Status' FROM items JOIN accounts ON items.foundlost_by = accounts.id LEFT JOIN 'founded' ON items.id = founded.item WHERE items.status = 'approved' AND founded.id is NULL;`
                     con.query(sql, (err, resaudit) => {
                         var mysql_data = JSON.parse(JSON.stringify(resaudit));
 
