@@ -547,7 +547,8 @@ router.get('/countitems', async (req, res) => {
             "Clothing": tagcount[2],
             "Writing Materials": tagcount[3],
             "Instruments": tagcount[4],
-            "Other": tagcount[5]
+            "Other": tagcount[5],
+            "Total": (tagcount[0] + tagcount[1] + tagcount[2] + tagcount[3] + tagcount[4] + tagcount[5])
         }
     })
 })
@@ -561,7 +562,7 @@ router.get('/countitems/approved', async (req, res) => {
         "Clothing",
         "Writing_Materials",
         "Instruments",
-        "Other"
+        "Other",
     ]
     var tagcount = []
     await tags.forEach(element => {
@@ -578,7 +579,8 @@ router.get('/countitems/approved', async (req, res) => {
             "Clothing": tagcount[2],
             "Writing Materials": tagcount[3],
             "Instruments": tagcount[4],
-            "Other": tagcount[5]
+            "Other": tagcount[5],
+            "Total": (tagcount[0] + tagcount[1] + tagcount[2] + tagcount[3] + tagcount[4] + tagcount[5])
         }
     })
 })
@@ -609,7 +611,8 @@ router.get('/countitems/pending', async (req, res) => {
             "Clothing": tagcount[2],
             "Writing Materials": tagcount[3],
             "Instruments": tagcount[4],
-            "Other": tagcount[5]
+            "Other": tagcount[5],
+            "Total": (tagcount[0] + tagcount[1] + tagcount[2] + tagcount[3] + tagcount[4] + tagcount[5])
         }
     })
 })
@@ -640,7 +643,8 @@ router.get('/countitems/founded', async (req, res) => {
             "Clothing": tagcount[2],
             "Writing Materials": tagcount[3],
             "Instruments": tagcount[4],
-            "Other": tagcount[5]
+            "Other": tagcount[5],
+            "Total": (tagcount[0] + tagcount[1] + tagcount[2] + tagcount[3] + tagcount[4] + tagcount[5])
         }
     })
 })
